@@ -2,6 +2,18 @@ package main
 import (
     "time"
 )
+type Conn struct {
+    regex string
+}
+type validchecker interface {
+    doesmatchbody() bool
+}
+func (g Gitpayload) doesmatchbody(regex string) bool {
+    if matchstring(g.Compare,regex){
+        return true
+    }
+    return false
+}
 type Gitpayload struct {
     Ref     string      `json:"ref"`
     Before  string      `json:"before"`

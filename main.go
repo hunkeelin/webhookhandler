@@ -5,16 +5,22 @@ import (
     "log"
     "encoding/json"
 )
-type Conn struct {
-    regex string
-}
 func (f *Conn) handleWebHook(w http.ResponseWriter, r *http.Request) {
     var gitpayload Gitpayload
-    json.NewDecoder(r.Body).Decode(&gitpayload)
-    if matchstring(gitpayload.Compare,f.regex) {
-        fmt.Println("match!")
+    err := json.NewDecoder(r.Body).Decode(&gitpayload)
+    if err != nil {
+        log.Fatal("cannot decode body with gitstruct")
+    }
+   // if matchstring(gitpayload.Compare,f.regex) {
+   //     fmt.Println("match!")
+   // }
+    if gitpayload.doesmatchbody(f.regex) {
+        fmt.Println("match")
+    } else {
+        fmt.Println("not match")
     }
     fmt.Println(r.Header["X-Github-Event"][0])
+    fmt.Println(r.Header)
 }
 func main() {
     newcon := new(Conn)

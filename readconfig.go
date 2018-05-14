@@ -1,59 +1,31 @@
 package main
 
 import (
-    "github.com/hunkeelin/klinenv"
-    "log"
-    "strconv"
+	"github.com/hunkeelin/klinenv"
+	"log"
+	"strconv"
 )
 
-func readconfig() (toreturn []string, concur int) {
-    var to_return []string
-    confpath := "/etc/genkins/genkins.conf"
+func readconfig() (toreturn map[string]string, concur int) {
+	to_return := make(map[string]string)
+	confvalues := []string{"lockfile", "giturl", "certpath", "keypath", "bindaddr", "port"}
+	config := klinenv.NewAppConfig("genkins.conf")
 
-    config := klinenv.NewAppConfig("genkins.conf")
+	for _, element := range confvalues {
+		confval, err := config.Get(element)
+		if err != nil {
+			log.Fatal("unable to retrieve the value of " + element + "check config file ")
+		}
+		to_return[element] = confval
+	}
 
-    certdir, err := config.Get("certpath")
-    if err != nil {
-        log.Fatal("unable to retrieve the value of certdir check config file " + confpath)
-    }
-    to_return = append(to_return,certdir)
-    keydir, err := config.Get("keypath")
-    if err != nil {
-        log.Fatal("unable to retrieve the value of certdir check config file " + confpath)
-    }
-    to_return = append(to_return,keydir)
-
-    remote, err := config.Get("giturl")
-    if err != nil {
-        log.Fatal("unable to retrieve the value of remote check config file " + confpath)
-    }
-    to_return = append(to_return,remote)
-
-    lockfile, err := config.Get("lockfile")
-    if err != nil {
-        log.Fatal("unable to retrieve the value of lockfile check config file " + confpath)
-    }
-    to_return = append(to_return,lockfile)
-
-    bindaddr, err := config.Get("bindaddr")
-    if err != nil {
-        log.Fatal("unable to retrieve the value of bindaddr check config file " + confpath)
-    }
-    to_return = append(to_return,bindaddr)
-
-    port, err := config.Get("port")
-    if err != nil {
-        log.Fatal("unable to retrieve the value of bindaddr check config file " + confpath)
-    }
-    to_return = append(to_return,port)
-
-    rconcur, err := config.Get("concur")
-    if err != nil {
-        log.Fatal("unable to retrieve the value of concur check config file " + confpath)
-    }
-    to_return_int, err := strconv.Atoi(rconcur)
-    if err != nil {
-        log.Fatal("can't convert string to int for concur in " + confpath)
-    }
-    return to_return, to_return_int
+	rconcur, err := config.Get("concur")
+	if err != nil {
+		log.Fatal("unable to retrieve the value of concur check config file")
+	}
+	to_return_int, err := strconv.Atoi(rconcur)
+	if err != nil {
+		log.Fatal("can't convert string to int for concur")
+	}
+	return to_return, to_return_int
 }

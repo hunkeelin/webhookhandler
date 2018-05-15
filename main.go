@@ -1,11 +1,12 @@
 package main
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
-	//	"time"
+	"time"
 )
 
 func (f *Conn) handleWebHook(w http.ResponseWriter, r *http.Request) {
@@ -42,16 +43,23 @@ func main() {
 	newcon := new(Conn)
 	config, _ := readconfig()
 	newcon.regex = config["giturl"]
-	http.HandleFunc("/", newcon.handleWebHook)
-	//	s := &http.Server{
-	//		Addr:         ":8080",
-	//		ReadTimeout:  5 * time.Second,
-	//		WriteTimeout: 10 * time.Second,
-	//		IdleTimeout:  120 * time.Second,
-	//	}
-	//	log.Fatal(s.ListenAndServeTLS("", ""))
-	err := http.ListenAndServeTLS(config["bindaddr"]+":"+config["port"], config["certpath"], config["keypath"], nil)
-	if err != nil {
-		log.Fatal("Unable to Listen to port", err)
+	tlsconfig := &tls.Config{
+		PreferServerCipherSuites: true,
+		// Only use curves which have assembly implementations
+		CurvePreferences: []tls.CurveID{
+			tls.CurveP256,
+			tls.X25519, // Go 1.8 only
+		},
 	}
+	c := http.NewServeMux()
+	c.HandleFunc("/", newcon.handleWebHook)
+	s := &http.Server{
+		Addr:         config["bindaddr"] + ":" + config["port"],
+		TLSConfig:    tlsconfig,
+		Handler:      c,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  120 * time.Second,
+	}
+	log.Fatal(s.ListenAndServeTLS(config["certpath"], config["keypath"]))
 }

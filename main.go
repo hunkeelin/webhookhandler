@@ -3,7 +3,7 @@ package main
 import (
 	"crypto/tls"
 	"encoding/json"
-	"fmt"
+	//	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -22,27 +22,26 @@ func (f *Conn) handleWebHook(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Bad Request,the payload is not a valid json\n"))
 		return
 	}
-
-	fmt.Println(r.Header.Get("api-key"))
-	if r.Header.Get("api-key") != "password" {
-		fmt.Println("wrong api key")
+	if r.Header.Get("api-key") != f.apikey {
+		w.WriteHeader(405)
+		w.Write([]byte("Wrong apikey\n"))
 		return
 	}
-	if g.doesmatchbody(f.regex) {
-		w.WriteHeader(200)
-		w.Write([]byte("Matches\n"))
-		return
-	} else {
+	if !g.doesmatchbody(f.regex) {
 		w.WriteHeader(400)
-		w.Write([]byte("Doesn't match " + f.regex))
+		w.Write([]byte("Doesn't Match " + f.regex))
 		return
 	}
+	// logic
+	w.WriteHeader(200)
+	w.Write([]byte("Status ok: do logic\n"))
 	return
 }
 func main() {
 	newcon := new(Conn)
 	config, _ := readconfig()
 	newcon.regex = config["giturl"]
+	newcon.apikey = config["apikey"]
 	tlsconfig := &tls.Config{
 		PreferServerCipherSuites: true,
 		// Only use curves which have assembly implementations
@@ -61,5 +60,8 @@ func main() {
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  120 * time.Second,
 	}
-	log.Fatal(s.ListenAndServeTLS(config["certpath"], config["keypath"]))
+	err := s.ListenAndServeTLS(config["certpath"], config["keypath"])
+	if err != nil {
+		log.Fatal("can't listen and serve check port and binding addr")
+	}
 }

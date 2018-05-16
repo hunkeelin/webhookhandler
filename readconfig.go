@@ -8,7 +8,7 @@ import (
 
 func readconfig() (toreturn map[string]string, concur int) {
 	to_return := make(map[string]string)
-	confvalues := []string{"lockfile", "giturl", "certpath", "keypath", "bindaddr", "port"}
+	confvalues := []string{"lockfile", "giturl", "certpath", "keypath", "bindaddr", "port", "apikey"}
 	config := klinenv.NewAppConfig("genkins.conf")
 
 	for _, element := range confvalues {

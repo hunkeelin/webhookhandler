@@ -145,6 +145,11 @@ func checkstring(s, pattern string) {
 		log.Fatal("error missing single quotes on line: ", s)
 	}
 }
+func checkerr (e error){
+    if e != nil {
+        log.Fatal(e)
+    }
+}
 
 func trim(x string) string {
 	pattern := "'"

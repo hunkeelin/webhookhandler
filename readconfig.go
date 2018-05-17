@@ -6,19 +6,8 @@ import (
 	"strconv"
 )
 
-func readconfig() (toreturn map[string]string, concur int) {
-	to_return := make(map[string]string)
-	confvalues := []string{"lockfile", "giturl", "certpath", "keypath", "bindaddr", "port", "apikey"}
+func readconfig() (toreturn klinenv.AppConfig, concur int) {
 	config := klinenv.NewAppConfig("genkins.conf")
-
-	for _, element := range confvalues {
-		confval, err := config.Get(element)
-		if err != nil {
-			log.Fatal("unable to retrieve the value of " + element + "check config file ")
-		}
-		to_return[element] = confval
-	}
-
 	rconcur, err := config.Get("concur")
 	if err != nil {
 		log.Fatal("unable to retrieve the value of concur check config file")
@@ -27,5 +16,5 @@ func readconfig() (toreturn map[string]string, concur int) {
 	if err != nil {
 		log.Fatal("can't convert string to int for concur")
 	}
-	return to_return, to_return_int
+	return config, to_return_int
 }

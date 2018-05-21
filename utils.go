@@ -15,6 +15,9 @@ import (
 	"sync"
 	"time"
 )
+func dowork(s string){
+    fmt.Println(s)
+}
 func signBody(secret, body []byte) []byte {
     computed := hmac.New(sha1.New, secret)
     computed.Write(body)

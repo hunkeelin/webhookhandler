@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/tls"
 	"encoding/json"
+    "sync"
 	"fmt"
 	"log"
     "bytes"
@@ -45,6 +46,17 @@ func (f *Conn) handleWebHook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// logic
+    sema := make(chan struct{},f.concur)
+    wg := sync.WaitGroup{}
+    for _,i := range f.hosts {
+        sema <- struct{}{}
+        wg.Add(1)
+        go func (g string){
+            <-sema
+            dowork(g)
+            wg.Done()
+        }(i)
+    }
 	w.WriteHeader(200)
 	w.Write([]byte("Status ok: do logic\n"))
 	return
@@ -56,6 +68,8 @@ func main() {
     newcon.regex = c.giturl
     newcon.apikey = c.apikey
     newcon.secret = c.secret
+    newcon.concur = c.concur
+    newcon.hosts = c.hosts
     // end of define config params
 	tlsconfig := &tls.Config{
 		PreferServerCipherSuites: true,

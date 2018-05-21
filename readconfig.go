@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/hunkeelin/klinenv"
 	"log"
+    "strings"
 	"strconv"
 )
 
@@ -44,7 +45,11 @@ func readconfig() Config {
     secret, err := config.Get("secret")
     checkerr(err)
     c.secret = secret
-    
+
+    hosts, err := config.Get("hosts")
+    checkerr(err)
+    c.hosts = strings.Split(hosts,",")
+
     c.concur = concur
 	return c
 }

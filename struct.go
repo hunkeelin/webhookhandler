@@ -8,6 +8,8 @@ type Conn struct {
 	regex  string
 	apikey string
     secret string
+    concur int
+    hosts   []string
 }
 type validchecker interface {
 	doesmatchbody() bool
@@ -27,6 +29,7 @@ type Config struct {
     certpath string
     keypath string
     secret string
+    hosts   []string
     concur int
 }
 

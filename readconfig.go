@@ -6,15 +6,45 @@ import (
 	"strconv"
 )
 
-func readconfig() (toreturn klinenv.AppConfig, concur int) {
+func readconfig() Config {
 	config := klinenv.NewAppConfig("genkins.conf")
 	rconcur, err := config.Get("concur")
 	if err != nil {
 		log.Fatal("unable to retrieve the value of concur check config file")
 	}
-	to_return_int, err := strconv.Atoi(rconcur)
+	concur, err := strconv.Atoi(rconcur)
 	if err != nil {
 		log.Fatal("can't convert string to int for concur")
 	}
-	return config, to_return_int
+    var c Config
+    giturl , err  := config.Get("giturl")
+    checkerr(err)
+    c.giturl = giturl
+
+    apikey, err := config.Get("apikey")
+    checkerr(err)
+    c.apikey = apikey
+
+    bindaddr , err := config.Get("bindaddr")
+    checkerr(err)
+    c.bindaddr = bindaddr
+
+    port, err := config.Get("port")
+    checkerr(err)
+    c.port = port
+
+    certpath, err := config.Get("certpath")
+    checkerr(err)
+    c.certpath = certpath
+
+    keypath, err := config.Get("keypath")
+    checkerr(err)
+    c.keypath = keypath
+
+    secret, err := config.Get("secret")
+    checkerr(err)
+    c.secret = secret
+    
+    c.concur = concur
+	return c
 }

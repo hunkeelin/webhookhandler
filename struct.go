@@ -19,6 +19,16 @@ func (g Gitpayload) doesmatchbody(regex string) bool {
 	}
 	return false
 }
+type Config struct {
+    giturl string
+    apikey string
+    bindaddr string
+    port    string
+    certpath string
+    keypath string
+    secret string
+    concur int
+}
 
 type Gitpayload struct {
 	Ref     string      `json:"ref"`

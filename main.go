@@ -34,9 +34,9 @@ func (f *Conn) handleWebHook(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Bad Request,the payload is not a valid json\n"))
 		return
 	}
-//	if r.Header.Get("api-key") != f.apikey {
+//	if r.Header.Get("api-key") != f.c.apikey {
 //		w.WriteHeader(405)
-//		w.Write([]byte("Wrong apikey\n"))
+//		w.Write([]byte("Wrong c.apikey\n"))
 //		return
 //	}
 	if !g.doesmatchbody(f.regex) {
@@ -52,24 +52,10 @@ func (f *Conn) handleWebHook(w http.ResponseWriter, r *http.Request) {
 func main() {
 	newcon := new(Conn)
     // define config params
-	config, _ := readconfig()
-	regex , err  := config.Get("giturl")
-    checkerr(err)
-    newcon.regex = regex
-	apikey, err := config.Get("apikey")
-    checkerr(err)
-    newcon.apikey = apikey
-    binddir , err := config.Get("bindaddr")
-    checkerr(err)
-    addrport, err := config.Get("port")
-    checkerr(err)
-    certpath, err := config.Get("certpath")
-    checkerr(err)
-    keypath, err := config.Get("keypath")
-    checkerr(err)
-    secret, err := config.Get("secret")
-    checkerr(err)
-    newcon.secret = secret
+	c := readconfig()
+    newcon.regex = c.giturl
+    newcon.apikey = c.apikey
+    newcon.secret = c.secret
     // end of define config params
 	tlsconfig := &tls.Config{
 		PreferServerCipherSuites: true,
@@ -79,18 +65,18 @@ func main() {
 			tls.X25519, // Go 1.8 only
 		},
 	}
-	c := http.NewServeMux()
-	c.HandleFunc("/", newcon.handleWebHook)
+	con := http.NewServeMux()
+	con.HandleFunc("/", newcon.handleWebHook)
 	s := &http.Server{
-		Addr:         binddir + ":" + addrport,
+		Addr:         c.bindaddr + ":" + c.port,
 		TLSConfig:    tlsconfig,
-		Handler:      c,
+		Handler:      con,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  120 * time.Second,
 	}
-    fmt.Println("listening to " + binddir + " " + addrport)
-	err = s.ListenAndServeTLS(certpath, keypath)
+    fmt.Println("listening to " + c.bindaddr + " " + c.port)
+	err := s.ListenAndServeTLS(c.certpath, c.keypath)
 	if err != nil {
 		log.Fatal("can't listen and serve check port and binding addr")
 	}

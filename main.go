@@ -34,9 +34,9 @@ func (f *Conn) handleWebHook(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Bad Request,the payload is not a valid json\n"))
 		return
 	}
-//	if r.Header.Get("api-key") != f.c.apikey {
+//	if r.Header.Get("api-key") != f.apikey {
 //		w.WriteHeader(405)
-//		w.Write([]byte("Wrong c.apikey\n"))
+//		w.Write([]byte("Wrong apikey\n"))
 //		return
 //	}
 	if !g.doesmatchbody(f.regex) {
@@ -62,7 +62,7 @@ func main() {
 		// Only use curves which have assembly implementations
 		CurvePreferences: []tls.CurveID{
 			tls.CurveP256,
-			tls.X25519, // Go 1.8 only
+			tls.X25519,
 		},
 	}
 	con := http.NewServeMux()

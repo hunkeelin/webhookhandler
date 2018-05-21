@@ -7,6 +7,7 @@ import (
 type Conn struct {
 	regex  string
 	apikey string
+    secret string
 }
 type validchecker interface {
 	doesmatchbody() bool

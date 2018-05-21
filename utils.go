@@ -5,13 +5,36 @@ import (
 	"github.com/theckman/go-flock"
 	"log"
 	"net/http"
+    "crypto/sha1"
+    "crypto/hmac"
 	"os"
 	"os/exec"
 	"regexp"
+    "encoding/hex"
 	"strings"
 	"sync"
 	"time"
 )
+func signBody(secret, body []byte) []byte {
+    computed := hmac.New(sha1.New, secret)
+    computed.Write(body)
+    return []byte(computed.Sum(nil))
+}
+
+func verifySignature(secret []byte, signature string, body []byte) bool {
+
+    const signaturePrefix = "sha1="
+    const signatureLength = 45 // len(SignaturePrefix) + len(hex(sha1))
+
+    if len(signature) != signatureLength || !strings.HasPrefix(signature, signaturePrefix) {
+        return false
+    }
+
+    actual := make([]byte, 20)
+    hex.Decode(actual, []byte(signature[5:]))
+
+    return hmac.Equal(signBody(secret, body), actual)
+}
 
 func isvalidmethod(r *http.Request) bool {
 	methodlist := []string{"GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "CONNECT", "OPTOINS", "TRACE"}

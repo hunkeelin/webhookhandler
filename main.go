@@ -5,28 +5,40 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+    "bytes"
+    "io"
+    "io/ioutil"
 	"net/http"
 	"time"
 )
 
 func (f *Conn) handleWebHook(w http.ResponseWriter, r *http.Request) {
+    secret := []byte(f.secret)
+    limitbody := io.LimitReader(r.Body,65535)
+    body, _ := ioutil.ReadAll(limitbody)
+    if !verifySignature(secret,r.Header.Get("X-Hub-Signature"),body){
+        w.WriteHeader(402)
+		w.Write([]byte("Bad signiture \n"))
+		return
+    }
 	if !isvalidmethod(r) {
 		w.WriteHeader(405)
 		w.Write([]byte("Bad request method " + r.Method + "\n"))
 		return
 	}
 	var g Gitpayload
-	err := json.NewDecoder(r.Body).Decode(&g)
+    b := bytes.NewReader(body)
+	err := json.NewDecoder(b).Decode(&g)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("Bad Request,the payload is not a valid json\n"))
 		return
 	}
-	if r.Header.Get("api-key") != f.apikey {
-		w.WriteHeader(405)
-		w.Write([]byte("Wrong apikey\n"))
-		return
-	}
+//	if r.Header.Get("api-key") != f.apikey {
+//		w.WriteHeader(405)
+//		w.Write([]byte("Wrong apikey\n"))
+//		return
+//	}
 	if !g.doesmatchbody(f.regex) {
 		w.WriteHeader(400)
 		w.Write([]byte("Doesn't Match " + f.regex))
@@ -55,6 +67,9 @@ func main() {
     checkerr(err)
     keypath, err := config.Get("keypath")
     checkerr(err)
+    secret, err := config.Get("secret")
+    checkerr(err)
+    newcon.secret = secret
     // end of define config params
 	tlsconfig := &tls.Config{
 		PreferServerCipherSuites: true,

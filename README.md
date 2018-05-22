@@ -19,10 +19,10 @@ Assume the following:
 - webhook comes from https://github.somecompany.com/IT/testrepo
 
 - create the directory /tmp/jobs/github.somecompany.com/IT/testrepo
-- create the config file /tmp/jobs/github.somecompany.com/IT/testrepo/config with the following content
+- create the config file /tmp/jobs/github.somecompany.com/IT/testrepo/config
 
 #### /tmp/jobs/github.somecompany.com/IT/testrepo/config ####
-secret = mysecret // this secret is the same secret you setup in your githooks via github. This is to verify the signiture to prevent dubious server from sending request to genkins. 
+- secret = mysecret // this secret is the same secret you setup in your githooks via github. This is to verify the signiture to prevent dubious server from sending request to genkins. 
 
 - for any jobs create any files ending with *.conf in the directory e.g /tmp/jobs/github.somecompany.com/IT/testrepo/foo.conf
 

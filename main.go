@@ -9,7 +9,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"sync"
 	"time"
 )
 
@@ -24,13 +23,12 @@ func (f *Conn) handleWebHook(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Bad Request,the payload is not a valid json\n"))
 		return
 	}
-	d, err := Determine(f.jobdir, g)
+	rs, t, err := Determine(f.jobdir, g)
 	if err != nil {
 		fmt.Println("error reading config file ", err)
 		return
 	}
-
-	secret := []byte(d.secret)
+	secret := []byte(rs)
 	if !verifySignature(secret, r.Header.Get("X-Hub-Signature"), body) {
 		w.WriteHeader(402)
 		w.Write([]byte("Bad signiture \n"))
@@ -42,18 +40,15 @@ func (f *Conn) handleWebHook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// logic
-	sema := make(chan struct{}, f.concur)
-	wg := sync.WaitGroup{}
-	for _, i := range f.hosts {
-		sema <- struct{}{}
-		wg.Add(1)
-		go func(g string) {
-			<-sema
-			dowork(g)
-			wg.Done()
-		}(i)
-	}
-	fmt.Println("dowork")
+    for _,task := range t {
+        cmd := "sh"
+        args := []string{task.cmd}
+        err := runshell(cmd,args)
+        if err != nil{
+            fmt.Println(task.cmd)
+            fmt.Println(err)
+        }
+    }
 	w.WriteHeader(200)
 	w.Write([]byte("Status ok: do logic\n"))
 	return
@@ -64,7 +59,6 @@ func main() {
 	c := readconfig()
 	newcon.apikey = c.apikey
 	newcon.concur = c.concur
-	newcon.hosts = c.hosts
 	newcon.jobdir = c.jobdir
 
 	tlsconfig := &tls.Config{
@@ -86,8 +80,8 @@ func main() {
 		IdleTimeout:  120 * time.Second,
 	}
 	fmt.Println("listening to " + c.bindaddr + " " + c.port)
-	//	err := s.ListenAndServeTLS(c.certpath, c.keypath)
-	err := s.ListenAndServe()
+	err := s.ListenAndServeTLS(c.certpath, c.keypath)
+	//err := s.ListenAndServe()
 	if err != nil {
 		log.Fatal("can't listen and serve check port and binding addr")
 	}

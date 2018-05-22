@@ -118,10 +118,10 @@ func exist(path string) (bool, error) {
 }
 
 func runshell(cmd string, args []string) error {
-	err := exec.Command(cmd, args...).Run()
-	//  acmd := exec.Command(cmd, args...)
-	//  out,err := acmd.CombinedOutput()
-	//  fmt.Printf("%s\n",out)
+	//err := exec.Command(cmd, args...).Run()
+	acmd := exec.Command(cmd, args...)
+	out,err := acmd.CombinedOutput()
+	fmt.Printf("%s\n",out)
 	return err
 }
 

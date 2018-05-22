@@ -3,6 +3,9 @@ package main
 import (
 	"time"
 )
+type JobConfig struct {
+    cmd    string
+}
 
 type Conn struct {
 	regex  string

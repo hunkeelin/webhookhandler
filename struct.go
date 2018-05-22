@@ -2,9 +2,10 @@ package main
 
 import (
 	"time"
+    "sync"
 )
 type JobConfig struct {
-    cmd    string
+    run    string
 }
 
 type Conn struct {
@@ -12,6 +13,8 @@ type Conn struct {
 	apikey string
 	concur int
 	jobdir string
+    mu sync.Mutex
+    sem chan struct{}
 	hosts  []string
 }
 type validchecker interface {

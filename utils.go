@@ -17,8 +17,10 @@ import (
 	"time"
 )
 
-func dowork(s string) {
-	fmt.Println(s)
+func dowork() {
+	fmt.Println("start")
+    time.Sleep(9 * time.Second)
+	fmt.Println("end")
 }
 func joblist(path string) map[string]string {
 	m := make(map[string]string)

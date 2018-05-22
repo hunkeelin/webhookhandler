@@ -10,10 +10,13 @@ import (
 func Determine(p string, g Gitpayload) (string,[]JobConfig, error) {
     var secret string
     var out []JobConfig
+    if g.Repository.URL == ""{
+        return secret,out,errors.New("Repo URL doesn't exist in payload")
+    }
     path := p + strings.TrimPrefix(g.Repository.URL, "https://")
-    check,_ := exist(path)
+    check,_ := exist(path+"/"+"config")
     if !check{
-        return secret,out,errors.New("path doesn't exist")
+        return secret,out,errors.New("Config and path doesn't exist \n"+"P:"+path+"\n"+"F:"+path+"/config")
     }
     // return secret
     jobconfig := klinenv.NewAppConfig(path+"/"+"config")
@@ -29,11 +32,11 @@ func Determine(p string, g Gitpayload) (string,[]JobConfig, error) {
     }
     for _,jobpath := range jobpaths {
         job := klinenv.NewAppConfig(jobpath)
-        cmd, err := job.Get("cmd")
+        run, err := job.Get("run")
         if err != nil {
             return secret,out, err
         }
-        j := JobConfig{cmd: cmd}
+        j := JobConfig{run: run}
         out = append(out,j)
     }
     return secret,out, nil

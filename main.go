@@ -25,7 +25,7 @@ func (f *Conn) handleWebHook(w http.ResponseWriter, r *http.Request) {
 	}
 	rs, t, err := Determine(f.jobdir, g)
 	if err != nil {
-		fmt.Println("error reading config file ", err)
+		fmt.Println("error reading config file:", err)
 		return
 	}
 	secret := []byte(rs)
@@ -42,13 +42,18 @@ func (f *Conn) handleWebHook(w http.ResponseWriter, r *http.Request) {
 	// logic
     for _,task := range t {
         cmd := "sh"
-        args := []string{task.cmd}
+        args := []string{task.run}
         err := runshell(cmd,args)
         if err != nil{
-            fmt.Println(task.cmd)
+            fmt.Println(task.run)
             fmt.Println(err)
         }
     }
+    //f.mu.Lock()
+    f.sem <- struct{}{}
+    dowork()
+    <-f.sem
+    ////f.mu.Unlock()
 	w.WriteHeader(200)
 	w.Write([]byte("Status ok: do logic\n"))
 	return
@@ -57,6 +62,8 @@ func main() {
 	newcon := new(Conn)
 	// define config params
 	c := readconfig()
+    sema := make(chan struct {},1)
+    newcon.sem = sema
 	newcon.apikey = c.apikey
 	newcon.concur = c.concur
 	newcon.jobdir = c.jobdir

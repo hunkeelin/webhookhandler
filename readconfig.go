@@ -3,8 +3,8 @@ package main
 import (
 	"github.com/hunkeelin/klinenv"
 	"log"
-    "strings"
 	"strconv"
+	"strings"
 )
 
 func readconfig() Config {
@@ -17,39 +17,38 @@ func readconfig() Config {
 	if err != nil {
 		log.Fatal("can't convert string to int for concur")
 	}
-    var c Config
-    giturl , err  := config.Get("giturl")
-    checkerr(err)
-    c.giturl = giturl
+	var c Config
+	apikey, err := config.Get("apikey")
+	checkerr(err)
+	c.apikey = apikey
 
-    apikey, err := config.Get("apikey")
-    checkerr(err)
-    c.apikey = apikey
+	bindaddr, err := config.Get("bindaddr")
+	checkerr(err)
+	c.bindaddr = bindaddr
 
-    bindaddr , err := config.Get("bindaddr")
-    checkerr(err)
-    c.bindaddr = bindaddr
+	port, err := config.Get("port")
+	checkerr(err)
+	c.port = port
 
-    port, err := config.Get("port")
-    checkerr(err)
-    c.port = port
+	certpath, err := config.Get("certpath")
+	checkerr(err)
+	c.certpath = certpath
 
-    certpath, err := config.Get("certpath")
-    checkerr(err)
-    c.certpath = certpath
+	keypath, err := config.Get("keypath")
+	checkerr(err)
+	c.keypath = keypath
 
-    keypath, err := config.Get("keypath")
-    checkerr(err)
-    c.keypath = keypath
+	hosts, err := config.Get("hosts")
+	checkerr(err)
+	c.hosts = strings.Split(hosts, ",")
 
-    secret, err := config.Get("secret")
-    checkerr(err)
-    c.secret = secret
+	jobdir, err := config.Get("jobdir")
+	checkerr(err)
+	if string(jobdir[len(jobdir)-1]) != "/" {
+		jobdir = jobdir + "/"
+	}
+	c.jobdir = jobdir
 
-    hosts, err := config.Get("hosts")
-    checkerr(err)
-    c.hosts = strings.Split(hosts,",")
-
-    c.concur = concur
+	c.concur = concur
 	return c
 }

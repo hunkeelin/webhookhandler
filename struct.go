@@ -7,9 +7,9 @@ import (
 type Conn struct {
 	regex  string
 	apikey string
-    secret string
-    concur int
-    hosts   []string
+	concur int
+	jobdir string
+	hosts  []string
 }
 type validchecker interface {
 	doesmatchbody() bool
@@ -21,16 +21,16 @@ func (g Gitpayload) doesmatchbody(regex string) bool {
 	}
 	return false
 }
+
 type Config struct {
-    giturl string
-    apikey string
-    bindaddr string
-    port    string
-    certpath string
-    keypath string
-    secret string
-    hosts   []string
-    concur int
+	apikey   string
+	bindaddr string
+	port     string
+	certpath string
+	keypath  string
+	jobdir   string
+	hosts    []string
+	concur   int
 }
 
 type Gitpayload struct {

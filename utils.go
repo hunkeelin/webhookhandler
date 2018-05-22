@@ -1,42 +1,68 @@
 package main
 
 import (
+	"crypto/hmac"
+	"crypto/sha1"
+	"encoding/hex"
 	"fmt"
 	"github.com/theckman/go-flock"
 	"log"
 	"net/http"
-    "crypto/sha1"
-    "crypto/hmac"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"regexp"
-    "encoding/hex"
 	"strings"
 	"sync"
 	"time"
 )
-func dowork(s string){
-    fmt.Println(s)
+
+func dowork(s string) {
+	fmt.Println(s)
+}
+func joblist(path string) map[string]string {
+	m := make(map[string]string)
+	err := os.Chdir(path)
+	if err != nil {
+		log.Fatal("no such file or directory ", path)
+	}
+	ls, _ := filepath.Glob("*")
+	for _, provider := range ls { //github.com and other provider
+		os.Chdir(path + provider)
+		orgs, _ := filepath.Glob("*")
+		for _, org := range orgs { //github.com/orgs
+			os.Chdir(path + provider + "/" + org)
+			jobs, _ := filepath.Glob("*")
+			for _, job := range jobs { // going through each jobs
+				confdir, _ := os.Getwd()
+				confdir = confdir + "/" + job + "/" + "config.xml"
+				url := "https://" + provider + "/" + org + "/" + job
+				m[strings.ToLower(url)] = confdir
+
+			}
+		}
+	}
+	return m
 }
 func signBody(secret, body []byte) []byte {
-    computed := hmac.New(sha1.New, secret)
-    computed.Write(body)
-    return []byte(computed.Sum(nil))
+	computed := hmac.New(sha1.New, secret)
+	computed.Write(body)
+	return []byte(computed.Sum(nil))
 }
 
 func verifySignature(secret []byte, signature string, body []byte) bool {
 
-    const signaturePrefix = "sha1="
-    const signatureLength = 45 // len(SignaturePrefix) + len(hex(sha1))
+	const signaturePrefix = "sha1="
+	const signatureLength = 45 // len(SignaturePrefix) + len(hex(sha1))
 
-    if len(signature) != signatureLength || !strings.HasPrefix(signature, signaturePrefix) {
-        return false
-    }
+	if len(signature) != signatureLength || !strings.HasPrefix(signature, signaturePrefix) {
+		return false
+	}
 
-    actual := make([]byte, 20)
-    hex.Decode(actual, []byte(signature[5:]))
+	actual := make([]byte, 20)
+	hex.Decode(actual, []byte(signature[5:]))
 
-    return hmac.Equal(signBody(secret, body), actual)
+	return hmac.Equal(signBody(secret, body), actual)
 }
 
 func isvalidmethod(r *http.Request) bool {
@@ -171,10 +197,10 @@ func checkstring(s, pattern string) {
 		log.Fatal("error missing single quotes on line: ", s)
 	}
 }
-func checkerr (e error){
-    if e != nil {
-        log.Fatal(e)
-    }
+func checkerr(e error) {
+	if e != nil {
+		log.Fatal(e)
+	}
 }
 
 func trim(x string) string {

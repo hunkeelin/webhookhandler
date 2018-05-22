@@ -1,12 +1,8 @@
 package main
 
 import (
-	"bytes"
 	"crypto/tls"
-	"encoding/json"
 	"fmt"
-	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"time"
@@ -15,64 +11,23 @@ import (
 func (f *Conn) handleWebHook(w http.ResponseWriter, r *http.Request) {
     switch apikey := r.Header.Get("api-key"); apikey {
         case "": //github json by defualt
-            if r.Header.Get("content-type") != "application/json"{
-                w.WriteHeader(http.StatusBadRequest)
-                w.Write([]byte("Bad Request,the payload is not application/json \n"))
-                return
-            }
-            limitbody := io.LimitReader(r.Body, 65535)
-            body, _ := ioutil.ReadAll(limitbody)
-            var g Gitpayload
-            b := bytes.NewReader(body)
-            err := json.NewDecoder(b).Decode(&g)
-            if err != nil {
-                w.WriteHeader(http.StatusBadRequest)
-                w.Write([]byte("Bad Request,the payload is not a valid json\n"))
-                return
-            }
-            rs, t, err := Determine(f.jobdir, g)
-            if err != nil {
-                fmt.Println("error reading config file:", err)
-                return
-            }
-            secret := []byte(rs)
-            if !verifySignature(secret, r.Header.Get("X-Hub-Signature"), body) {
-                w.WriteHeader(402)
-                w.Write([]byte("Bad signiture \n"))
-                return
-            }
-            if !isvalidmethod(r) {
-                w.WriteHeader(405)
-                w.Write([]byte("Bad request method " + r.Method + "\n"))
-                return
-            }
-            // logic
-            for _,task := range t {
-                cmd := "sh"
-                args := []string{task.run}
-                err := runshell(cmd,args)
-                if err != nil{
-                    fmt.Println(task.run)
-                    fmt.Println(err)
-                }
-            }
-        case f.apikey:
+            msg,status := GitWork(r,f)
+            w.WriteHeader(status)
+            w.Write([]byte(msg))
+            fmt.Println(msg,status)
+            return
+        case f.apikey: // application specific.
             fmt.Println("right apikey")
             return
-        default:
+        default: // application specific but wrong api key. 
             fmt.Println("wrong apikey")
             w.WriteHeader(300)
             w.Write([]byte("Wrong apikey\n"))
             return
     }
     //f.mu.Lock()
-    //f.sem <- struct{}{}
     //dowork()
-    //<-f.sem
     ////f.mu.Unlock()
-	w.WriteHeader(200)
-	w.Write([]byte("Status ok: do logic\n"))
-	return
 }
 func main() {
 	newcon := new(Conn)

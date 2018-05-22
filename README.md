@@ -1,11 +1,8 @@
 ### INTRODUCTION ###
-stable-1.0.3 added slack support. If you do not wnat slack support use stable-1.0.2
-### INTRODUCTION ###
 Jenkins written in go. Smaller memory footprint. Take less resource and many time faster. It is also more secure by default. 
 
-# Instructions #
 
-###Please edit /etc/genkins/genkins.conf###
+### Please edit /etc/genkins/genkins.conf ###
 - concur: The number of thread use. Set to the number of CPU for max performance
 - lockfile: the location of the lockfile
 - certpath: the webcert path 
@@ -24,12 +21,13 @@ Assume the following:
 - create the directory /tmp/jobs/github.somecompany.com/IT/testrepo
 - create the config file /tmp/jobs/github.somecompany.com/IT/testrepo/config with the following content
 
-####/tmp/jobs/github.somecompany.com/IT/testrepo/config####
+#### /tmp/jobs/github.somecompany.com/IT/testrepo/config ####
 secret = mysecret // this secret is the same secret you setup in your githooks via github. This is to verify the signiture to prevent dubious server from sending request to genkins. 
 
 - for any jobs create any files ending with *.conf in the directory e.g /tmp/jobs/github.somecompany.com/IT/testrepo/foo.conf
 
-####/tmp/jobs/github.somecompany.com/IT/testrepo/foo.conf####
+#### /tmp/jobs/github.somecompany.com/IT/testrepo/foo.conf ####
+
 run=/tmp/foo.sh
 
 

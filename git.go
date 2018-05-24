@@ -7,7 +7,32 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+    "errors"
 )
+func CheckSecret(rs string,r *http.Request,body []byte)(error,string,int){
+    secret := []byte(rs)
+    if !verifySignature(secret, r.Header.Get("X-Hub-Signature"), body) {
+        return errors.New("non nil"),"Bad Signiture",402
+    }
+    if !isvalidmethod(r) {
+        return errors.New("non nil"),"Bad request method " + r.Method,405
+    }
+    return nil,"",0
+}
+func GitExec(t []JobConfig,f *Conn){
+    for _,task := range t {
+        cmd := "sh"
+        args := []string{task.run}
+        err := runshell(cmd,args)
+        if err != nil{
+            fmt.Println(task.run)
+            fmt.Println(err)
+        }
+    }
+//    f.sem <- struct{}{}
+//    dowork()
+//    <-f.sem
+}
 
 func GitWork(r *http.Request,f *Conn)(string,int) {
     if r.Header.Get("content-type") != "application/json"{
@@ -21,29 +46,27 @@ func GitWork(r *http.Request,f *Conn)(string,int) {
     if err != nil {
         return "Bad Request,the payload is not a valid json ",400
     }
-    rs, t, err := Determine(f.jobdir, g)
+    rs, t, err := Determine(f.jobdir, g,"org")
+    if err != nil {
+        fmt.Println(err)
+    //    return "Error reading config file: ",300
+    } else {
+        err,st,in := CheckSecret(rs,r,body)
+        if err != nil {
+            return st,in
+        }
+        GitExec(t,f)
+    }
+    rs, t, err = Determine(f.jobdir, g,"repo")
     if err != nil {
         fmt.Println(err)
         return "Error reading config file: ",300
-    }
-    secret := []byte(rs)
-    if !verifySignature(secret, r.Header.Get("X-Hub-Signature"), body) {
-        return "Bad Signiture",402
-    }
-    if !isvalidmethod(r) {
-        return "Bad request method " + r.Method,405
-    }
-    for _,task := range t {
-        cmd := "sh"
-        args := []string{task.run}
-        err := runshell(cmd,args)
-        if err != nil{
-            fmt.Println(task.run)
-            fmt.Println(err)
+    } else {
+        err,st,in := CheckSecret(rs,r,body)
+        if err != nil {
+            return st,in
         }
+        GitExec(t,f)
     }
-    f.sem <- struct{}{}
-    dowork()
-    <-f.sem
     return "Status -ok ", 200
 }

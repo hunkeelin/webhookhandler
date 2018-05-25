@@ -12,7 +12,7 @@ import (
 func CheckSecret(rs string,r *http.Request,body []byte)(error,string,int){
     secret := []byte(rs)
     if !verifySignature(secret, r.Header.Get("X-Hub-Signature"), body) {
-        return errors.New("non nil"),"Bad Signiture",402
+        return errors.New("non nil"),"Bad Signiture is the secret correct in the config?",402
     }
     if !isvalidmethod(r) {
         return errors.New("non nil"),"Bad request method " + r.Method,405

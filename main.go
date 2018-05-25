@@ -58,8 +58,8 @@ func main() {
 		IdleTimeout:  120 * time.Second,
 	}
 	fmt.Println("listening to " + c.bindaddr + " " + c.port)
-	err := s.ListenAndServeTLS(c.certpath, c.keypath)
-	//err := s.ListenAndServe()
+	//err := s.ListenAndServeTLS(c.certpath, c.keypath)
+	err := s.ListenAndServe()
 	if err != nil {
 		log.Fatal("can't listen and serve check port and binding addr")
 	}

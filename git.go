@@ -24,7 +24,7 @@ func GitExec(t []JobConfig, f *Conn) {
 	for _, task := range t {
 		cmd := "sh"
 		args := []string{task.run}
-		err := runshell(cmd, args)
+		err := runshell(cmd, args, f.uid, f.gid)
 		if err != nil {
 			fmt.Println(args)
 			fmt.Println(err)

@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/hunkeelin/klinenv"
 	"log"
+	"os/user"
 	"strconv"
 	"strings"
 )
@@ -37,6 +38,20 @@ func readconfig() Config {
 	keypath, err := config.Get("keypath")
 	checkerr(err)
 	c.keypath = keypath
+
+	rawuser, err := config.Get("user")
+	checkerr(err)
+	if rawuser == "root" || rawuser == "" {
+		log.Fatal("invalid user, please specify a non root user in genkins.conf")
+	}
+	userdata, err := user.Lookup(rawuser)
+	checkerr(err)
+	uid, err := strconv.ParseUint(userdata.Uid, 10, 32)
+	checkerr(err)
+	c.uid = uint32(uid)
+	gid, err := strconv.ParseUint(userdata.Gid, 10, 32)
+	checkerr(err)
+	c.gid = uint32(gid)
 
 	hosts, err := config.Get("hosts")
 	checkerr(err)

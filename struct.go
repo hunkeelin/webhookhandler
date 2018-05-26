@@ -1,11 +1,12 @@
 package main
 
 import (
+	"sync"
 	"time"
-    "sync"
 )
+
 type JobConfig struct {
-    run    string
+	run string
 }
 
 type Conn struct {
@@ -13,8 +14,10 @@ type Conn struct {
 	apikey string
 	concur int
 	jobdir string
-    mu sync.Mutex
-    sem chan struct{}
+	uid    uint32
+	gid    uint32
+	mu     sync.Mutex
+	sem    chan struct{}
 	hosts  []string
 }
 type validchecker interface {
@@ -31,6 +34,8 @@ func (g Gitpayload) doesmatchbody(regex string) bool {
 type Config struct {
 	apikey   string
 	bindaddr string
+	uid      uint32
+	gid      uint32
 	port     string
 	certpath string
 	keypath  string

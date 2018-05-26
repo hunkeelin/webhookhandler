@@ -120,11 +120,11 @@ func exist(path string) (bool, error) {
 	return true, err
 }
 
-func runshell(cmd string, args []string) error {
+func runshell(cmd string, args []string, uid, gid uint32) error {
 	//err := exec.Command(cmd, args...).Run()
 	acmd := exec.Command(cmd, args...)
 	acmd.SysProcAttr = &syscall.SysProcAttr{}
-	acmd.SysProcAttr.Credential = &syscall.Credential{Uid: 1000, Gid: 1000}
+	acmd.SysProcAttr.Credential = &syscall.Credential{Uid: uid, Gid: gid}
 	out, err := acmd.CombinedOutput()
 	fmt.Printf("%s\n", out)
 	return err

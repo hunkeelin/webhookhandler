@@ -38,6 +38,8 @@ func main() {
 	newcon.sem = sema
 	newcon.apikey = c.apikey
 	newcon.concur = c.concur
+	newcon.uid = c.uid
+	newcon.gid = c.gid
 	newcon.jobdir = c.jobdir
 
 	tlsconfig := &tls.Config{

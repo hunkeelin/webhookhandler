@@ -7,13 +7,19 @@ import (
     "strings"
 )
 
-func Determine(p string, g Gitpayload) (string,[]JobConfig, error) {
+func Determine(p string, g Gitpayload,d string) (string,[]JobConfig, error) {
     var secret string
     var out []JobConfig
-    if g.Repository.URL == ""{
+    var fs string
+    if d == "repo" {
+        fs = g.Repository.URL
+    } else {
+        fs = g.Repository.Owner.HTMLURL
+    }
+    if fs == ""{
         return secret,out,errors.New("Repo URL doesn't exist in payload")
     }
-    path := p + strings.TrimPrefix(g.Repository.URL, "https://")
+    path := p + strings.TrimPrefix(fs, "https://")
     check,_ := exist(path+"/"+"config")
     if !check{
         return secret,out,errors.New("Config and path doesn't exist \n"+"P:"+path+"\n"+"F:"+path+"/config")

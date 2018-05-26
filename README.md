@@ -5,6 +5,7 @@ Jenkins written in go. Smaller memory footprint. Take less resource and many tim
 ### Please edit /etc/genkins/genkins.conf ###
 - concur: The number of thread use. Set to the number of CPU for max performance
 - lockfile: the location of the lockfile
+- user: The user that is running any commands. Use genkins for default. 
 - certpath: the webcert path 
 - keypath: the webkey path 
 - bindaddr: bind to the interface you want the service to run. If left blank it will bind to all interface

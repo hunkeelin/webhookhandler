@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"os"
 )
 
 func CheckSecret(rs string, r *http.Request, body []byte) (error, string, int) {
@@ -21,6 +22,7 @@ func CheckSecret(rs string, r *http.Request, body []byte) (error, string, int) {
 	return nil, "", 0
 }
 func GitExec(t []JobConfig, f *Conn) {
+	//	os.Chdir("/var/lib/genkins")
 	for _, task := range t {
 		cmd := "sh"
 		args := []string{task.run}

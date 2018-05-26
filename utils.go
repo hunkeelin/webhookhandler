@@ -14,12 +14,13 @@ import (
 	"regexp"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 )
 
 func dowork() {
 	fmt.Println("start")
-    time.Sleep(9 * time.Second)
+	time.Sleep(9 * time.Second)
 	fmt.Println("end")
 }
 func joblist(path string) map[string]string {
@@ -122,8 +123,10 @@ func exist(path string) (bool, error) {
 func runshell(cmd string, args []string) error {
 	//err := exec.Command(cmd, args...).Run()
 	acmd := exec.Command(cmd, args...)
-	out,err := acmd.CombinedOutput()
-	fmt.Printf("%s\n",out)
+	acmd.SysProcAttr = &syscall.SysProcAttr{}
+	acmd.SysProcAttr.Credential = &syscall.Credential{Uid: 1000, Gid: 1000}
+	out, err := acmd.CombinedOutput()
+	fmt.Printf("%s\n", out)
 	return err
 }
 

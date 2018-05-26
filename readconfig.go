@@ -8,7 +8,7 @@ import (
 )
 
 func readconfig() Config {
-	config := klinenv.NewAppConfig("/etc/genkins/genkins.conf")
+	config := klinenv.NewAppConfig("genkins.conf")
 	rconcur, err := config.Get("concur")
 	if err != nil {
 		log.Fatal("unable to retrieve the value of concur check config file")

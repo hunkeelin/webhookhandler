@@ -22,7 +22,7 @@ func CheckSecret(rs string, r *http.Request, body []byte) (error, string, int) {
 	return nil, "", 0
 }
 func GitExec(t []JobConfig, f *Conn) {
-	//	os.Chdir("/var/lib/genkins")
+	os.Chdir(f.homedir)
 	for _, task := range t {
 		cmd := "sh"
 		args := []string{task.run}

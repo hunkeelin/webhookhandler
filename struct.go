@@ -10,15 +10,16 @@ type JobConfig struct {
 }
 
 type Conn struct {
-	regex  string
-	apikey string
-	concur int
-	jobdir string
-	uid    uint32
-	gid    uint32
-	mu     sync.Mutex
-	sem    chan struct{}
-	hosts  []string
+	regex   string
+	homedir string
+	apikey  string
+	concur  int
+	jobdir  string
+	uid     uint32
+	gid     uint32
+	mu      sync.Mutex
+	sem     chan struct{}
+	hosts   []string
 }
 type validchecker interface {
 	doesmatchbody() bool
@@ -32,6 +33,7 @@ func (g Gitpayload) doesmatchbody(regex string) bool {
 }
 
 type Config struct {
+	homedir  string
 	apikey   string
 	bindaddr string
 	uid      uint32

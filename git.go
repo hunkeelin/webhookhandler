@@ -8,7 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"os"
+    "os"
 )
 
 func CheckSecret(rs string, r *http.Request, body []byte) (error, string, int) {

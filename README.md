@@ -1,6 +1,8 @@
 ### INTRODUCTION ###
 Jenkins written in go. Smaller memory footprint. Take less resource and many time faster. It is also more secure by default. 
 
+### Feature ###
+- Run this as root and root. Do not run it as any user.
 
 ### Please edit /etc/genkins/genkins.conf ###
 - concur: The number of thread use. Set to the number of CPU for max performance

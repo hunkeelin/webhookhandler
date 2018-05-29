@@ -46,12 +46,17 @@ func readconfig() Config {
 	}
 	userdata, err := user.Lookup(rawuser)
 	checkerr(err)
+
 	uid, err := strconv.ParseUint(userdata.Uid, 10, 32)
 	checkerr(err)
+
 	c.uid = uint32(uid)
 	gid, err := strconv.ParseUint(userdata.Gid, 10, 32)
+
 	checkerr(err)
 	c.gid = uint32(gid)
+
+	c.homedir = userdata.HomeDir
 
 	hosts, err := config.Get("hosts")
 	checkerr(err)

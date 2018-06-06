@@ -2,13 +2,16 @@ package main
 
 import (
 	"crypto/tls"
-    "os"
+    "flag"
 	"fmt"
 	"log"
 	"net/http"
 	"time"
 )
 
+var (
+    gconfdir  = flag.String("config", "/etc/genkins/genkins.conf", "location of the genkins.conf")
+)
 func (f *Conn) handleWebHook(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(r.RemoteAddr)
 	switch apikey := r.Header.Get("api-key"); apikey {
@@ -32,9 +35,10 @@ func (f *Conn) handleWebHook(w http.ResponseWriter, r *http.Request) {
 	////f.mu.Unlock()
 }
 func main() {
+    flag.Parse()
 	newcon := new(Conn)
 	// define config params
-	c := readconfig(os.Args[1])
+	c := readconfig(*gconfdir)
 	sema := make(chan struct{}, 1)
 	newcon.sem = sema
 	newcon.apikey = c.apikey

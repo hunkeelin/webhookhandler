@@ -2,6 +2,7 @@ package main
 
 import (
 	"crypto/tls"
+    "os"
 	"fmt"
 	"log"
 	"net/http"
@@ -33,7 +34,7 @@ func (f *Conn) handleWebHook(w http.ResponseWriter, r *http.Request) {
 func main() {
 	newcon := new(Conn)
 	// define config params
-	c := readconfig()
+	c := readconfig(os.Args[1])
 	sema := make(chan struct{}, 1)
 	newcon.sem = sema
 	newcon.apikey = c.apikey

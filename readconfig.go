@@ -8,8 +8,8 @@ import (
 	"strings"
 )
 
-func readconfig() Config {
-	config := klinenv.NewAppConfig("genkins.conf")
+func readconfig(p string) Config {
+	config := klinenv.NewAppConfig(p)
 	rconcur, err := config.Get("concur")
 	if err != nil {
 		log.Fatal("unable to retrieve the value of concur check config file")
@@ -64,10 +64,14 @@ func readconfig() Config {
 
 	jobdir, err := config.Get("jobdir")
 	checkerr(err)
-	if string(jobdir[len(jobdir)-1]) != "/" {
-		jobdir = jobdir + "/"
-	}
-	c.jobdir = jobdir
+    if len(jobdir) == 0 {
+        c.jobdir = jobdir
+    } else {
+        if string(jobdir[len(jobdir)-1]) != "/" {
+            jobdir = jobdir + "/"
+        }
+        c.jobdir = jobdir
+    }
 
 	c.concur = concur
 	return c

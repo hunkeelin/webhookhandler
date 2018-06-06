@@ -49,18 +49,20 @@ func GitWork(r *http.Request, f *Conn) (string, int) {
 	if err != nil {
 		return "Bad Request,the payload is not a valid json ", 400
 	}
-	rs, t, err := Determine(f.jobdir, g, "org")
+	rs, t, err := Determine(f.jobdir, g, "repo")
 	if err != nil {
 		fmt.Println(err)
 		//    return "Error reading config file: ",300
 	} else {
 		err, st, in := CheckSecret(rs, r, body)
 		if err != nil {
-			return st, in
+            if in == 405 {
+                return st, in
+            }
 		}
 		GitExec(t, f)
 	}
-	rs, t, err = Determine(f.jobdir, g, "repo")
+	rs, t, err = Determine(f.jobdir, g, "org")
 	if err != nil {
 		fmt.Println(err)
 		return "Error reading config file: ", 300

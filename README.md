@@ -34,4 +34,4 @@ Assume the following:
 run=/tmp/foo.sh
 
 
-- The above example is bascially equivalent to jenkins's execute shell feature. Therefore genkins should never be ran as root. 
+- The above example is bascially equivalent to jenkins's execute shell feature.

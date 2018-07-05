@@ -2,7 +2,7 @@ package main
 
 import (
 	"crypto/tls"
-    "flag"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,8 +10,10 @@ import (
 )
 
 var (
-    gconfdir  = flag.String("config", "/etc/genkins/genkins.conf", "location of the genkins.conf")
+	gconfdir = flag.String("config", "/etc/genkins/genkins.conf", "location of the genkins.conf")
+	notls    = flag.Bool("notls", false, "whether to run it as http")
 )
+
 func (f *Conn) handleWebHook(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(r.RemoteAddr)
 	switch apikey := r.Header.Get("api-key"); apikey {
@@ -35,7 +37,7 @@ func (f *Conn) handleWebHook(w http.ResponseWriter, r *http.Request) {
 	////f.mu.Unlock()
 }
 func main() {
-    flag.Parse()
+	flag.Parse()
 	newcon := new(Conn)
 	// define config params
 	c := readconfig(*gconfdir)
@@ -67,8 +69,12 @@ func main() {
 		IdleTimeout:  120 * time.Second,
 	}
 	fmt.Println("listening to " + c.bindaddr + " " + c.port)
-	//err := s.ListenAndServeTLS(c.certpath, c.keypath)
-	err := s.ListenAndServe()
+	var err error
+	if *notls {
+		err = s.ListenAndServe()
+	} else {
+		err = s.ListenAndServeTLS(c.certpath, c.keypath)
+	}
 	if err != nil {
 		log.Fatal("can't listen and serve check port and binding addr")
 	}
